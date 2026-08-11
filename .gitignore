@@ -1,0 +1,5 @@
+*kubeconfig*
+*.key
+*.pem
+windows-amd64/
+helm.zip
