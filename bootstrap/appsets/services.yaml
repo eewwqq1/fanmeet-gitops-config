@@ -4,6 +4,8 @@ metadata:
   name: fanmeet-services
   namespace: argocd
 spec:
+  syncPolicy:
+    preserveResourcesOnDeletion: true
   generators:
     - list:
         elements:
