@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fanmeet-gitops-root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/eewwqq1/fanmeet-gitops-config.git
+    targetRevision: main
+    path: bootstrap/appsets
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

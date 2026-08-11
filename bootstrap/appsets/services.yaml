@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: fanmeet-services
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - service: server
+          - service: media
+          - service: notification
+          - service: membership-billing
+  template:
+    metadata:
+      name: "fanmeet-{{service}}"
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/eewwqq1/fanmeet-gitops-config.git
+        targetRevision: main
+        path: charts/service
+        helm:
+          releaseName: "fanmeet-{{service}}"
+          valueFiles:
+            - "../../environments/onprem/values-{{service}}.yaml"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: fanmeet
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=false
