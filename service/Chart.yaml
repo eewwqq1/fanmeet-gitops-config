@@ -1,0 +1,9 @@
+apiVersion: v2
+name: service
+description: >-
+  Common chart for Fanmeet's four deployment units (monolith + media/notification/
+  membership-billing services). See docs/superpowers/specs/2026-08-11-helm-chart-standardization.md
+  for the values contract this chart relies on — it never branches per service, only values do.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,0 +1,38 @@
+# Fanmeet monolith (app-source/server). Largest of the 4 deployment units — everything else
+# is a values override, the chart template never branches on which service this is.
+image:
+  repository: fanmeet-server
+  tag: local
+  pullPolicy: IfNotPresent
+
+port: 20100
+
+# Actuator runs on a separate management port here (unlike the 3 extracted services) —
+# see docs/superpowers/specs/2026-08-11-helm-chart-standardization.md for why.
+healthCheckPort: 20101
+healthCheckPath: /actuator/health
+
+replicas: 2
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 768Mi
+  limits:
+    cpu: "1"
+    memory: 1536Mi
+
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: prod
+  # management.server.address=127.0.0.1 in application-{dev,prod}.properties is a sane
+  # local-dev default but unreachable by kubelet's HTTP probes (they hit the pod IP, not the
+  # container's loopback interface) — override for any K8s deployment without touching the
+  # properties files' local-dev security default.
+  - name: MANAGEMENT_SERVER_ADDRESS
+    value: "0.0.0.0"
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://fanmeet-postgres:5432/FANMEET_DEV
+
+service:
+  port: 80

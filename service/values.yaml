@@ -1,0 +1,36 @@
+# Default values — every field here is overridden by a per-service values-*.yaml file.
+# See docs/superpowers/specs/2026-08-11-helm-chart-standardization.md for the design rationale.
+
+image:
+  repository: ""
+  tag: local
+  pullPolicy: IfNotPresent
+
+# Port the container actually serves traffic on.
+port: 8080
+
+# Port the liveness/readiness probes hit. Leave empty to reuse `port` — only the monolith
+# overrides this (it exposes actuator on a separate management port).
+healthCheckPort: ""
+
+# Path the liveness/readiness probes hit. Every Spring Boot service uses the actuator
+# default; only media-server (Node/Express) overrides this.
+healthCheckPath: /actuator/health
+
+replicas: 1
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# List of {name, value} pairs passed straight through as container env vars. Internal key
+# names differ per service (Spring relaxed-binding vs. Node's plain process.env) — the chart
+# doesn't care, it just forwards whatever's here.
+env: []
+
+service:
+  port: 80

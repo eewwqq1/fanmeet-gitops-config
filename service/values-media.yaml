@@ -1,0 +1,28 @@
+# media-server (app-source/media-server) — Node.js/Express. Different runtime than the other
+# 3 (JVM) but the chart's values contract doesn't care.
+image:
+  repository: fanmeet-media-server
+  tag: local
+  pullPolicy: IfNotPresent
+
+port: 8081
+
+# No actuator here — plain Express, already has GET /health (server.js) predating this chart.
+healthCheckPath: /health
+
+replicas: 1
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi
+
+env:
+  - name: PORT
+    value: "8081"
+
+service:
+  port: 80

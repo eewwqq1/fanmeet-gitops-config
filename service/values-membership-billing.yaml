@@ -1,0 +1,29 @@
+# membership-billing-service (app-source/membership-billing-service). Shares the monolith's
+# Postgres tables — see docs/superpowers/plans/2026-08-11-membership-billing-service-extraction.md.
+image:
+  repository: fanmeet-membership-billing-service
+  tag: local
+  pullPolicy: IfNotPresent
+
+port: 8083
+
+# Actuator health check added alongside this chart — see
+# docs/superpowers/specs/2026-08-11-helm-chart-standardization.md item 2.
+healthCheckPath: /actuator/health
+
+replicas: 1
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 300m
+    memory: 512Mi
+
+env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://fanmeet-postgres:5432/FANMEET_DEV
+
+service:
+  port: 80
