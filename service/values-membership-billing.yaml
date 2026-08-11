@@ -1,7 +1,7 @@
 # membership-billing-service (app-source/membership-billing-service). Shares the monolith's
 # Postgres tables — see docs/superpowers/plans/2026-08-11-membership-billing-service-extraction.md.
 image:
-  repository: fanmeet-membership-billing-service
+  repository: 211.183.3.1:5000/fanmeet-membership-billing-service
   tag: local
   pullPolicy: IfNotPresent
 
@@ -17,13 +17,19 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+  # No cpu limit: JVM startup (classloading + C2 JIT) is CPU-bursty, and a tight cpu limit
+  # causes severe CFS throttling that turns a ~10s local boot into minutes on constrained
+  # nodes — observed directly (jstack showed the C2 compiler thread burning 11.8s of CPU
+  # across 127s elapsed just to compile one small method). memory limit stays — OOM-kill is
+  # the correct behavior on a real leak/runaway, unlike CPU throttling on legitimate bursts.
   limits:
-    cpu: 300m
     memory: 512Mi
 
 env:
+  # "fanmeet-postgres" is a Docker container name on the Windows dev host, not resolvable
+  # from inside the K8s cluster — use the host's actual IP on the VMnet8 network.
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://fanmeet-postgres:5432/FANMEET_DEV
+    value: jdbc:postgresql://211.183.3.1:5432/FANMEET_DEV
 
 service:
   port: 80

@@ -30,17 +30,25 @@ spec:
           env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          # Slow-starting JVM apps (Spring context init) were getting killed by the liveness
+          # probe before they'd even opened the port — startupProbe holds liveness/readiness
+          # off until the app is actually up, with its own generous budget (up to 150s) for
+          # that first boot. Once it succeeds once, liveness/readiness take over as normal.
+          startupProbe:
+            httpGet:
+              path: {{ .Values.healthCheckPath }}
+              port: {{ $healthPort }}
+            failureThreshold: 60
+            periodSeconds: 5
           livenessProbe:
             httpGet:
               path: {{ .Values.healthCheckPath }}
               port: {{ $healthPort }}
-            initialDelaySeconds: 20
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: {{ .Values.healthCheckPath }}
               port: {{ $healthPort }}
-            initialDelaySeconds: 10
             periodSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

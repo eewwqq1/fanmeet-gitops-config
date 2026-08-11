@@ -1,7 +1,7 @@
 # media-server (app-source/media-server) — Node.js/Express. Different runtime than the other
 # 3 (JVM) but the chart's values contract doesn't care.
 image:
-  repository: fanmeet-media-server
+  repository: 211.183.3.1:5000/fanmeet-media-server
   tag: local
   pullPolicy: IfNotPresent
 

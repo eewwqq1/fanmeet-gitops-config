@@ -1,6 +1,6 @@
 # notification-service (app-source/notification-service).
 image:
-  repository: fanmeet-notification-service
+  repository: 211.183.3.1:5000/fanmeet-notification-service
   tag: local
   pullPolicy: IfNotPresent
 
@@ -16,13 +16,16 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+  # No cpu limit — see values-membership-billing.yaml for why (JVM startup CFS throttling,
+  # observed directly via jstack on this cluster).
   limits:
-    cpu: 300m
     memory: 512Mi
 
 env:
+  # "fanmeet-redis" is a Docker container name on the Windows dev host, not resolvable from
+  # inside the K8s cluster — use the host's actual IP on the VMnet8 network the cluster is on.
   - name: SPRING_REDIS_HOST
-    value: fanmeet-redis
+    value: "211.183.3.1"
 
 service:
   port: 80

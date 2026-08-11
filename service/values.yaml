@@ -23,8 +23,13 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+  # No default cpu limit — Helm deep-merges values files, so a default here would silently
+  # survive even when a values-*.yaml override tries to drop it (only setting it to null
+  # actually unsets an inherited key). JVM startup is CPU-bursty (classloading + C2 JIT); a
+  # tight cpu limit causes severe CFS throttling that turns a ~10s local boot into minutes —
+  # observed directly via jstack on this cluster. memory limit stays — OOM-kill is correct
+  # behavior for a real leak/runaway, unlike CPU throttling on a legitimate startup burst.
   limits:
-    cpu: 500m
     memory: 512Mi
 
 # List of {name, value} pairs passed straight through as container env vars. Internal key

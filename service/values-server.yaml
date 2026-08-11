@@ -1,7 +1,9 @@
 # Fanmeet monolith (app-source/server). Largest of the 4 deployment units — everything else
 # is a values override, the chart template never branches on which service this is.
 image:
-  repository: fanmeet-server
+  # Local registry container on the Windows dev host, reachable from the on-prem cluster's
+  # VMnet8 network (211.183.3.0/24) at the host's IP on that interface.
+  repository: 211.183.3.1:5000/fanmeet-server
   tag: local
   pullPolicy: IfNotPresent
 
@@ -18,13 +20,21 @@ resources:
   requests:
     cpu: 500m
     memory: 768Mi
+  # No cpu limit — see values-membership-billing.yaml for why (JVM startup CFS throttling,
+  # observed directly via jstack on this cluster). The monolith is the biggest JVM here, so
+  # it's the most exposed to this if a limit were set.
   limits:
-    cpu: "1"
     memory: 1536Mi
 
 env:
+  # NOTE: "dev" not "prod" — this K8s deployment is the stage-1 verification milestone
+  # (does the modernized app actually run on the on-prem cluster?), not a real prod cutover
+  # (that's a much later master-plan stage). The prod profile uses different ports
+  # (12400/12401) and different credentials than this chart assumes (20100/20101,
+  # FANMEET_DEV) — using it here without also changing `port`/`healthCheckPort` above would
+  # silently break. dev matches what's actually been built/tested all session.
   - name: SPRING_PROFILES_ACTIVE
-    value: prod
+    value: dev
   # management.server.address=127.0.0.1 in application-{dev,prod}.properties is a sane
   # local-dev default but unreachable by kubelet's HTTP probes (they hit the pod IP, not the
   # container's loopback interface) — override for any K8s deployment without touching the
@@ -32,7 +42,12 @@ env:
   - name: MANAGEMENT_SERVER_ADDRESS
     value: "0.0.0.0"
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://fanmeet-postgres:5432/FANMEET_DEV
+    value: jdbc:postgresql://211.183.3.1:5432/FANMEET_DEV
+  # application-common.properties defaults to spring.redis.host=localhost — unreachable from
+  # inside the pod. Confirmed as a real crash (ConnectException: Connection refused
+  # localhost/127.0.0.1:6379) during on-cluster verification.
+  - name: SPRING_REDIS_HOST
+    value: "211.183.3.1"
 
 service:
   port: 80
