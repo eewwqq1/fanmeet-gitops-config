@@ -51,3 +51,7 @@ env:
 
 service:
   port: 80
+  # Exposed via MetalLB (unlike the other 3 services, which stay ClusterIP-only) so a mobile
+  # app running on an emulator/device outside the cluster can reach it for manual verification.
+  # See docs/superpowers/specs/2026-08-11-helm-chart-standardization.md.
+  type: LoadBalancer
