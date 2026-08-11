@@ -1,0 +1,10 @@
+# Manually maintained for now — there is no CI/CD pipeline yet (no GitHub Actions,
+# images are built and pushed to the local registry by hand). This file exists so
+# the "image tag per service" concept has one place to live; once app-source gets
+# a CI pipeline, that pipeline should commit tag bumps here instead of editing
+# environments/onprem/values-*.yaml directly (keeps deploy-time changes as a
+# single-purpose diff, distinct from config changes).
+server: local
+media: local
+notification: local
+membership-billing: local
