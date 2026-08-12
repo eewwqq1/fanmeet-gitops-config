@@ -2,7 +2,7 @@
 # Postgres tables — see docs/superpowers/plans/2026-08-11-membership-billing-service-extraction.md.
 image:
   repository: 211.183.3.1:5000/fanmeet-membership-billing-service
-  tag: local
+  tag: "24e17c7"
   pullPolicy: IfNotPresent
 
 port: 8083

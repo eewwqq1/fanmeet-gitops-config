@@ -4,7 +4,7 @@ image:
   # Local registry container on the Windows dev host, reachable from the on-prem cluster's
   # VMnet8 network (211.183.3.0/24) at the host's IP on that interface.
   repository: 211.183.3.1:5000/fanmeet-server
-  tag: local
+  tag: "24e17c7"
   pullPolicy: IfNotPresent
 
 port: 20100
