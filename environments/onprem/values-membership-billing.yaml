@@ -30,6 +30,15 @@ env:
   # from inside the K8s cluster — use the host's actual IP on the VMnet8 network.
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://211.183.3.1:5432/FANMEET_DEV
+  # Overrides the hardcoded `spring.datasource.password` value baked into
+  # application.properties (Spring env vars take precedence over bundled
+  # properties files) — the rotated DB password lives only in this Secret now,
+  # not in source. See log.md session 12 for the rotation record.
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: fanmeet-db-credentials
+        key: password
 
 service:
   port: 80

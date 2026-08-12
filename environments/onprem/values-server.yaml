@@ -43,6 +43,15 @@ env:
     value: "0.0.0.0"
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://211.183.3.1:5432/FANMEET_DEV
+  # Overrides the hardcoded `spring.datasource.password` value baked into
+  # application-dev.properties (Spring env vars take precedence over bundled
+  # properties files) — the rotated DB password lives only in this Secret now,
+  # not in source. See log.md session 12 for the rotation record.
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: fanmeet-db-credentials
+        key: password
   # application-common.properties defaults to spring.redis.host=localhost — unreachable from
   # inside the pod. Confirmed as a real crash (ConnectException: Connection refused
   # localhost/127.0.0.1:6379) during on-cluster verification.
