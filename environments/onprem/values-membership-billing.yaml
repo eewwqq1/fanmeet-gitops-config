@@ -7,7 +7,7 @@ image:
   # has that gitignored real-secret file — the "local" tag was built manually by someone who
   # had the file present locally. This is a real, unresolved gap in the CI pipeline for this
   # one service; see log.md session 12. Do not re-bump this tag until that's fixed.
-  tag: local
+  tag: "cd74154"
   pullPolicy: IfNotPresent
 
 port: 8083

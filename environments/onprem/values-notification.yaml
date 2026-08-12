@@ -1,7 +1,7 @@
 # notification-service (app-source/notification-service).
 image:
   repository: 211.183.3.1:5000/fanmeet-notification-service
-  tag: 55d7862
+  tag: "cd74154"
   pullPolicy: IfNotPresent
 
 port: 8082
