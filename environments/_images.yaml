@@ -6,5 +6,5 @@
 # single-purpose diff, distinct from config changes).
 server: local
 media: local
-notification: local
+notification: 9488915
 membership-billing: local
