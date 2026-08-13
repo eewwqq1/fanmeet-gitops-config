@@ -1,8 +1,9 @@
 # fanmeet-gitops-config
 
 The single source of truth Argo CD watches for the Fanmeet on-prem K8s deployment.
-App code lives in the separate `데브옵스프로젝트/app-source` tree (not yet its own
-repo — see that repo's `log.md` for status).
+App code lives in the sibling `fanmeet-app-source` repo (private, has its own
+`Jenkinsfile`). The docs/orchestration hub for this whole migration project is
+`데브옵스프로젝트` (private) — see its `log.md` for current status.
 
 ## Layout
 
