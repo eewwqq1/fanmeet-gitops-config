@@ -1,9 +1,11 @@
 # Fanmeet monolith (app-source/server). Largest of the 4 deployment units — everything else
 # is a values override, the chart template never branches on which service this is.
 image:
-  # Local registry container on the Windows dev host, reachable from the on-prem cluster's
-  # VMnet8 network (211.183.3.0/24) at the host's IP on that interface.
-  repository: 211.183.3.1:5000/fanmeet-server
+  # Registry container on a dedicated Ubuntu VM (docker1/"manager", formerly an unused kubeadm
+  # test node, repurposed 2026-08-14), reachable from the on-prem cluster's VMnet8 network
+  # (211.183.3.0/24). Moved off the Windows host to escape Windows' dynamic TCP port-exclusion
+  # ranges (HNS-managed) intermittently colliding with the 5432/5433 port range — see log.md.
+  repository: 211.183.3.100:5000/fanmeet-server
   tag: "cd74154"
   pullPolicy: IfNotPresent
 
@@ -42,7 +44,7 @@ env:
   - name: MANAGEMENT_SERVER_ADDRESS
     value: "0.0.0.0"
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://211.183.3.1:5432/FANMEET_DEV
+    value: jdbc:postgresql://211.183.3.100:5432/FANMEET_DEV
   # Overrides the hardcoded `spring.datasource.password` value baked into
   # application-dev.properties (Spring env vars take precedence over bundled
   # properties files) — the rotated DB password lives only in this Secret now,
@@ -56,7 +58,7 @@ env:
   # inside the pod. Confirmed as a real crash (ConnectException: Connection refused
   # localhost/127.0.0.1:6379) during on-cluster verification.
   - name: SPRING_REDIS_HOST
-    value: "211.183.3.1"
+    value: "211.183.3.100"
 
 service:
   port: 80

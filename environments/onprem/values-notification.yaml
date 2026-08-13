@@ -1,6 +1,6 @@
 # notification-service (app-source/notification-service).
 image:
-  repository: 211.183.3.1:5000/fanmeet-notification-service
+  repository: 211.183.3.100:5000/fanmeet-notification-service
   tag: "cd74154"
   pullPolicy: IfNotPresent
 
@@ -22,10 +22,11 @@ resources:
     memory: 512Mi
 
 env:
-  # "fanmeet-redis" is a Docker container name on the Windows dev host, not resolvable from
-  # inside the K8s cluster — use the host's actual IP on the VMnet8 network the cluster is on.
+  # "fanmeet-redis" is a Docker container name on a dedicated VM (docker1/"manager", moved off
+  # the Windows dev host 2026-08-14 — see log.md), not resolvable from inside the K8s cluster —
+  # use that VM's actual IP on the VMnet8 network the cluster is on.
   - name: SPRING_REDIS_HOST
-    value: "211.183.3.1"
+    value: "211.183.3.100"
 
 service:
   port: 80

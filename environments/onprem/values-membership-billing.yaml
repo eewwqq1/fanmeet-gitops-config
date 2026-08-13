@@ -1,7 +1,7 @@
 # membership-billing-service (app-source/membership-billing-service). Shares the monolith's
 # Postgres tables — see docs/superpowers/plans/2026-08-11-membership-billing-service-extraction.md.
 image:
-  repository: 211.183.3.1:5000/fanmeet-membership-billing-service
+  repository: 211.183.3.100:5000/fanmeet-membership-billing-service
   # Rolled back from "24e17c7" (2026-08-12): that Jenkins-built image crash-loops on startup
   # (FileNotFoundException: gcp/serviceAccount.json) because Jenkins' clean git checkout never
   # has that gitignored real-secret file — the "local" tag was built manually by someone who
@@ -31,10 +31,11 @@ resources:
     memory: 512Mi
 
 env:
-  # "fanmeet-postgres" is a Docker container name on the Windows dev host, not resolvable
-  # from inside the K8s cluster — use the host's actual IP on the VMnet8 network.
+  # "fanmeet-postgres" is a Docker container name on a dedicated VM (docker1/"manager", moved
+  # off the Windows dev host 2026-08-14 — see log.md), not resolvable from inside the K8s
+  # cluster — use that VM's actual IP on the VMnet8 network.
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://211.183.3.1:5432/FANMEET_DEV
+    value: jdbc:postgresql://211.183.3.100:5432/FANMEET_DEV
   # Overrides the hardcoded `spring.datasource.password` value baked into
   # application.properties (Spring env vars take precedence over bundled
   # properties files) — the rotated DB password lives only in this Secret now,
