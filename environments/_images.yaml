@@ -4,7 +4,7 @@
 # a CI pipeline, that pipeline should commit tag bumps here instead of editing
 # environments/onprem/values-*.yaml directly (keeps deploy-time changes as a
 # single-purpose diff, distinct from config changes).
-server: "cd74154"
+server: "53a627c"
 media: local
 notification: "cd74154"
 membership-billing: "cd74154"
