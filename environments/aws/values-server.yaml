@@ -1,0 +1,71 @@
+# AWS (EKS) override for the fanmeet monolith (app-source/server). Same application config as
+# environments/onprem/values-server.yaml — only the infra-dependent bits differ: image comes
+# from ECR (on-prem's private registry CA isn't trusted by EKS worker nodes — see Task 9 note
+# in the dual-cluster-cutover plan), traffic comes in via an ALB (AWS Load Balancer Controller,
+# Task 7) instead of MetalLB, and the DB is RDS (Task 6) instead of the on-prem Postgres
+# container on docker1.
+image:
+  repository: "023179631876.dkr.ecr.ap-northeast-2.amazonaws.com/fanmeet-server"
+  tag: "cd74154"
+  pullPolicy: IfNotPresent
+
+port: 20100
+healthCheckPort: 20101
+healthCheckPath: /actuator/health
+
+replicas: 2
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 768Mi
+  limits:
+    memory: 1536Mi
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+  hosts:
+    - host: cutover.rlaehdrbs90.shop
+      paths:
+        - path: /
+          pathType: Prefix
+
+# NOTE: not consumed by the chart yet — no PVC/volume template exists (none of the 4 on-prem
+# values files use persistence either; these services are stateless). Kept per the plan's
+# values contract as a harmless override in case persistence is added later.
+persistence:
+  storageClassName: gp3
+
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: dev
+  - name: MANAGEMENT_SERVER_ADDRESS
+    value: "0.0.0.0"
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://devops-portfolio-rds.c3c8wy6o8kw2.ap-northeast-2.rds.amazonaws.com:5432/fanmeet
+  - name: SPRING_DATASOURCE_USERNAME
+    value: fanmeet_admin
+  # Overrides the hardcoded spring.datasource.password baked into application-dev.properties —
+  # populated from the fanmeet-db-credentials Secret created in the EKS fanmeet namespace
+  # (Task 9 Step 2), same pattern as the on-prem chart. Password value itself (Task 6's
+  # db_password terraform output) is never committed here or anywhere else in this repo.
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: fanmeet-db-credentials
+        key: password
+  # Redis still lives on docker1 (211.183.3.100) on the on-prem network — reachable from EKS
+  # over the WireGuard tunnel established in Task 1-4.
+  - name: SPRING_REDIS_HOST
+    value: "211.183.3.100"
+
+service:
+  port: 80
+  # ClusterIP (not LoadBalancer) — the ALB Ingress is the external entry point on this side,
+  # unlike on-prem where MetalLB fronts this Service directly.
+  type: ClusterIP

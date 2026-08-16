@@ -1,0 +1,44 @@
+# AWS (EKS) override for membership-billing-service (app-source/membership-billing-service).
+# Same application config as environments/onprem/values-membership-billing.yaml — only the
+# infra-dependent bits differ: image from ECR, and DB pointed at RDS (Task 6) instead of the
+# on-prem Postgres container on docker1. This service shares the monolith's Postgres tables,
+# same "fanmeet" database/user as values-server.yaml.
+image:
+  repository: "023179631876.dkr.ecr.ap-northeast-2.amazonaws.com/fanmeet-membership-billing"
+  tag: "cd74154"
+  pullPolicy: IfNotPresent
+
+port: 8083
+healthCheckPath: /actuator/health
+
+replicas: 1
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 512Mi
+
+# NOTE: not consumed by the chart yet — no PVC/volume template exists (none of the 4 on-prem
+# values files use persistence either; these services are stateless). Kept per the plan's
+# values contract as a harmless override in case persistence is added later.
+persistence:
+  storageClassName: gp3
+
+env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://devops-portfolio-rds.c3c8wy6o8kw2.ap-northeast-2.rds.amazonaws.com:5432/fanmeet
+  - name: SPRING_DATASOURCE_USERNAME
+    value: fanmeet_admin
+  # Overrides the hardcoded spring.datasource.password baked into application.properties —
+  # populated from the fanmeet-db-credentials Secret created in the EKS fanmeet namespace
+  # (Task 9 Step 2), same pattern as the on-prem chart and values-server.yaml.
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: fanmeet-db-credentials
+        key: password
+
+service:
+  port: 80

@@ -1,0 +1,34 @@
+# AWS (EKS) override for media-server (app-source/media-server, Node.js/Express). Only
+# infra-dependent values change from environments/onprem/values-media.yaml — this service is
+# stateless and has no database dependency (server.js reads only process.env.PORT), so there is
+# no DB env override here despite the plan's generic example — verified against source.
+image:
+  repository: "023179631876.dkr.ecr.ap-northeast-2.amazonaws.com/fanmeet-media"
+  tag: local
+  pullPolicy: IfNotPresent
+
+port: 8081
+healthCheckPath: /health
+
+replicas: 1
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi
+
+# NOTE: not consumed by the chart yet — no PVC/volume template exists (none of the 4 on-prem
+# values files use persistence either; these services are stateless). Kept per the plan's
+# values contract as a harmless override in case persistence is added later.
+persistence:
+  storageClassName: gp3
+
+env:
+  - name: PORT
+    value: "8081"
+
+service:
+  port: 80

@@ -39,3 +39,12 @@ env: []
 
 service:
   port: 80
+
+# Disabled by default (on-prem uses MetalLB LoadBalancer/ClusterIP Services, not Ingress) —
+# only the aws environment turns this on to get an ALB provisioned by the AWS Load Balancer
+# Controller (see environments/aws/values-*.yaml).
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []

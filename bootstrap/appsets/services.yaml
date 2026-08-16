@@ -7,15 +7,23 @@ spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
   generators:
-    - list:
-        elements:
-          - service: server
-          - service: media
-          - service: notification
-          - service: membership-billing
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - env: onprem
+                  server: https://kubernetes.default.svc
+                - env: aws
+                  server: "https://FDB5CF176615265D0AFACAC7A5D91FDC.gr7.ap-northeast-2.eks.amazonaws.com"
+          - list:
+              elements:
+                - service: server
+                - service: media
+                - service: notification
+                - service: membership-billing
   template:
     metadata:
-      name: "fanmeet-{{service}}"
+      name: "fanmeet-{{service}}-{{env}}"
       namespace: argocd
     spec:
       project: default
@@ -26,9 +34,9 @@ spec:
         helm:
           releaseName: "fanmeet-{{service}}"
           valueFiles:
-            - "../../environments/onprem/values-{{service}}.yaml"
+            - "../../environments/{{env}}/values-{{service}}.yaml"
       destination:
-        server: https://kubernetes.default.svc
+        server: "{{server}}"
         namespace: fanmeet
       syncPolicy:
         automated:
