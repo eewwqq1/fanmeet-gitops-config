@@ -15,6 +15,15 @@ healthCheckPath: /actuator/health
 
 replicas: 2
 
+# Recreate-style rollout (no surge pod) — the 2 EKS worker nodes (t3.small, ~1432Mi allocatable
+# each) are already ~80% memory-allocated by the 4 fanmeet services, leaving no room for the
+# default RollingUpdate's 3rd (surge) pod. maxUnavailable: 1 accepts a brief single-replica
+# window instead, which doesn't need extra capacity. On-prem is untouched (no equivalent block
+# in environments/onprem/values-server.yaml) since it doesn't have this constraint.
+rollingUpdate:
+  maxSurge: 0
+  maxUnavailable: 1
+
 resources:
   requests:
     cpu: 500m
