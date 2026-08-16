@@ -28,7 +28,7 @@ ingress:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+    alb.ingress.kubernetes.io/healthcheck-path: /misc/version/check
   hosts:
     - host: cutover.rlaehdrbs90.shop
       paths:
