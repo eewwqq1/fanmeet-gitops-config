@@ -6,7 +6,7 @@
 # container on docker1.
 image:
   repository: "023179631876.dkr.ecr.ap-northeast-2.amazonaws.com/fanmeet-server"
-  tag: "66334f6"
+  tag: "83dc9ad"
   pullPolicy: IfNotPresent
 
 port: 20100
