@@ -6,7 +6,7 @@ image:
   # (211.183.3.0/24). Moved off the Windows host to escape Windows' dynamic TCP port-exclusion
   # ranges (HNS-managed) intermittently colliding with the 5432/5433 port range — see log.md.
   repository: 211.183.3.100:5000/fanmeet-server
-  tag: "53a627c"
+  tag: "66334f6"
   pullPolicy: IfNotPresent
 
 port: 20100
