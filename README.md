@@ -11,7 +11,13 @@ App code lives in the sibling `fanmeet-app-source` repo (private, has its own
   (monolith + media/notification/membership-billing). The template never branches
   per service; only `environments/*/values-*.yaml` differ.
 - `environments/onprem/` — live values for the on-prem VMware cluster.
-- `environments/aws/` — stage-2 placeholder, not started.
+- `environments/aws/` — live values for the AWS EKS cluster (ALB ingress, RDS,
+  ECR image source). Kept in sync with `onprem/` on every build by the
+  `fanmeet-app-source` Jenkins pipeline's "Bump gitops-config tags" stage,
+  which commits both environments' tag bumps together. Note: the EKS cluster
+  itself is torn down between demo sessions to control cost — check
+  `데브옵스프로젝트`'s `log.md` for whether it's currently up before expecting
+  this Application to be Synced/Healthy.
 - `bootstrap/` — Argo CD "App of Apps": `root-app.yaml` is applied once by hand,
   everything else (the ApplicationSet, and the 4 Applications it generates) is
   then reconciled from this repo automatically.

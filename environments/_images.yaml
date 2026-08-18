@@ -1,9 +1,9 @@
-# Manually maintained for now — there is no CI/CD pipeline yet (no GitHub Actions,
-# images are built and pushed to the local registry by hand). This file exists so
-# the "image tag per service" concept has one place to live; once app-source gets
-# a CI pipeline, that pipeline should commit tag bumps here instead of editing
-# environments/onprem/values-*.yaml directly (keeps deploy-time changes as a
-# single-purpose diff, distinct from config changes).
+# Auto-bumped by the fanmeet-app-source Jenkins pipeline's "Bump gitops-config
+# tags" stage on every build that changes a service (same commit also bumps
+# the matching tag in environments/onprem/values-<svc>.yaml and
+# environments/aws/values-<svc>.yaml). Manual edits will just be overwritten
+# by the next build — this file is a tag-per-service reference, not the
+# source Argo CD deploys from (that's the per-environment values files).
 server: "83dc9ad"
 media: local
 notification: "cd74154"
